@@ -1,7 +1,7 @@
 
 const int greenLEDPin = 9;
-const int redLEDPin = 11;
-const int blueLEDPin = 10;
+const int redLEDPin = 10;
+const int blueLEDPin = 11;
 
 const int sensorPin = A0;
 
@@ -20,9 +20,10 @@ void setup() {
   
 }
 
+int power = 0;
 
 int computeIntensityHardCap(const int inputValue) {
-  return inputValue < MEDIUM_BOUND ? 20 : 0; 
+  return inputValue < MEDIUM_BOUND ? power : 0; 
 }
 
 int computeIntensity(const int inputValue) {
@@ -43,7 +44,7 @@ int filter(const int color) {
 }
 
 void loop() {
-  delay(100);
+  delay(50);
   sensorValue = analogRead(sensorPin);
 
   Serial.print("Raw Sensor value :");
@@ -56,8 +57,10 @@ void loop() {
   Serial.print("\n");
 
   analogWrite(greenLEDPin, displayValue * filter(1));
-  analogWrite(redLEDPin  , displayValue * filter(2));
-  analogWrite(blueLEDPin , displayValue * filter(4));
+  analogWrite(blueLEDPin, displayValue * filter(1) / 2);
+//  analogWrite(redLEDPin  , displayValue * filter(2));
+//  analogWrite(blueLEDPin , displayValue * filter(4));
 
   blinkColor = (blinkColor + 1) % 7;
+  power = (power + 3) % 60;
 }
