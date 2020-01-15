@@ -1,4 +1,4 @@
-# Eclairage intelligent
+# AmbiLearn
 
 ## Concept
 
@@ -27,6 +27,7 @@ Le site web permet de
 
 
 `npm install express body-parser --save`
+
 `node app.js`
 
 

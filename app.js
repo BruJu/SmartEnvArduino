@@ -33,6 +33,7 @@ let five = require("johnny-five");
 let board = new five.Board();
 
 const LED_PIN_IDS = { GREEN: 9, RED: 10, BLUE: 11 };
+const LIGHTSENSOR_PIN = "A0";
 
 let flashRedLed = undefined;
 let changeAmbiance = undefined;
@@ -42,11 +43,11 @@ board.on("ready", function() {
   led.blink(1500);
 
   let leds = {};
+  let lightSensor = new five.Light(LIGHTSENSOR_PIN);
 
   for (let ledId in LED_PIN_IDS) {
     leds[ledId] = { 'pin': new five.Led(LED_PIN_IDS[ledId]), 'hasToBeStopped': false };
   }
-
 
   function setColor(r, g, b) {
     leds['RED'].pin.brightness(r);
@@ -57,7 +58,7 @@ board.on("ready", function() {
   changeAmbiance = function(ambiance) {
     for (let ledID in LED_PIN_IDS) {
       leds[ledID].pin.brightness(0);
-      
+
       if (leds[ledID].hasToBeStopped) {
         leds[ledID].pin.stop();
         leds[ledID].hasToBeStopped = false;
@@ -94,6 +95,20 @@ board.on("ready", function() {
     leds['RED'].brightness(30);
     setTimeout(function() { leds['RED'].brightness(0); }, 2000);
   };
+
+  lightSensor.on("change", function() {
+    function normalize(val) {
+      if (val < 0.35) {
+        return -1;
+      } else if (val > 0.75) {
+        return 1;
+      } else {
+        return (val - 0.35) * 2;
+      }
+    }
+
+    setColor(60 * (1 - normalize(this.level)), 0, 0);
+  });
 });
 
 
