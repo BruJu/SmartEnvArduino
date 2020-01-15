@@ -32,6 +32,6 @@ Le site web permet de
 
 ## Auteurs
 
-- Jean-Mouloud BOURG
+- Thomas BOURG
 - Julian BRUYAT
 - Théo BUTTEZ
