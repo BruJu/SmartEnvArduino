@@ -18,6 +18,15 @@ Le site web permet de
 - Choisir une ambiance
 - Consulter l'historique des ambiances et des couleurs affichées
 
+### Inventaire
+- Une led multicolore
+- Une photorésistance
+
+
+### Starting the application
+
+`node app.js`
+
 
 ## Auteurs
 
