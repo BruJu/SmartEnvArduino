@@ -25,6 +25,8 @@ Le site web permet de
 
 ### Starting the application
 
+
+`npm install express body-parser --save`
 `node app.js`
 
 
