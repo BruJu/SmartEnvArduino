@@ -5,7 +5,7 @@
 ### La carte Arduino
 
 La carte Arduino possède :
-- Trois détecteus de luminosié (rouge, vert et bleu)
+- Trois détecteurs de luminosié (rouge, vert et bleu)
 - Une led multicolore
 
 La carte détecte la luminosité de l'environnement et produit ou non un
