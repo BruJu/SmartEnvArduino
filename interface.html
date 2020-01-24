@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  <section class="section">
+  <div class="section">
     <div class="container">
       <h1 class="title">
         AmbiLearn
@@ -19,36 +19,57 @@
         L'&eacute;clairage d'ambiance qui apprend &agrave; s'adapter !
       </p>
     </div>
-  </section>
-  <section class="panel">
+  </div>
+  <div class="panel">
     <div class="panel-block">
       <button class="button is-primary" onclick="trigger()">Déclencher le dispositif</button>
     </div>
-    <div class="control has-icons-left">
-      <div class="select is-rounded is-info is-large">
-        <select name="ambiance" id="ambiance" onchange="changeAmbiance();">
-          <option value="Sea">Mer</option>
-          <option value="Blood">Le champ de bataille !!!!i!i!i!i!!iiii!!!</option>
-          <option value="Wood">Promenons nous dans les bois pendant que le loup nous voit</option>
-          <option value="Horrible">Horrible aaaaaaah</option>
-          <option value="Stop">Stop</option>
-        </select>
-        <span class="icon is-medium is-left">
-          <i class="far fa-lightbulb"></i>
-        </span>
+    <div class="panel-block">
+      <div class="control has-icons-left">
+        <div class="select is-rounded is-info is-large">
+          <select name="ambiance" id="ambiance" onchange="changeAmbiance();">
+            <option value="Sea">Mer</option>
+            <option value="Blood">Le champ de bataille !!!!i!i!i!i!!iiii!!!</option>
+            <option value="Wood">Promenons nous dans les bois pendant que le loup nous voit</option>
+            <option value="Horrible">Horrible aaaaaaah</option>
+            <option value="Stop">Stop</option>
+          </select>
+          <span class="icon is-medium is-left">
+            <i class="far fa-lightbulb"></i>
+          </span>
+        </div>
       </div>
     </div>
-    <div class="panel">
-      <div class="panel-heading">Faire un retour &agrave; l'AmbiLearn</div>
-      <div class="panel-block">
-        <button class="button is-danger" onclick="feedback(-1)">Comportement ind&eacute;sir&eacute;</button>
-        <button class="button is-success" onclick="feedback(1)">Comportement ad&eacute;quat</button>
-      </div>
+  </div>
+  <div class="panel">
+    <div class="panel-heading">Faire un retour &agrave; l'AmbiLearn</div>
+    <div class="panel-block">
+      <button class="button is-danger" onclick="feedback(-1)">Comportement ind&eacute;sir&eacute;</button>
+      <button class="button is-success" onclick="feedback(1)">Comportement ad&eacute;quat</button>
     </div>
-  </section>
-  <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-    integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous">
-  </script>
+  </div>
+  <div class="panel">
+    <div class="panel-heading">Historique</div>
+    <div class="panel-block">
+      <button class="button">R&eacute;cup&eacute;rer l'historique</button>
+    </div>
+    <div class="panel_block">
+      <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+        <thead>
+          <tr>
+            <th>Ambiance</th>
+            <th>Couleur de la pi&egrave;ce</th>
+            <th>Couleur de la LED</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+    crossorigin="anonymous">
+    </script>
   <script src="communication.js"></script>
 </body>
 
