@@ -47,13 +47,40 @@ function changeInputRange(value) {
   return Math.floor(value * 2);
 }
 
+sensorColor = {}
+
 board.on("ready", function () {
   let leds = {};
   let sensor = {};
 
   for (let color in PINS) {
-    sensor[color] = new five.Light(PINS[color][1]);
+    let opt = { pin: PINS[color][1], freq: 250 };
+    console.log(opt);
+    sensor[color] = new five.Light(opt);
     leds[color] = new five.Led(PINS[color][0]);
+
+    if (color == 'BLUE') {
+      sensor[color].on("change", function () {
+        sensorColor[color] = this.level;
+
+        potentialInput = [
+          currentAmbiance,
+          changeInputRange(sensor.RED.level),
+          changeInputRange(sensor.GREEN.level),
+          changeInputRange(sensor.BLUE.level)
+        ];
+
+        if (brain[potentialInput]) {
+          readInput();
+          findOutput();
+          light();
+        }
+      });
+    } else {
+      sensor[color].on("change", function () {
+        sensorColor[color] = this.level;
+      });
+    }
   }
 
   light = function () {
@@ -105,7 +132,7 @@ app.post('/request', function (req, res) {
       saveInteraction();
     } else {
       forgetInteraction();
-      findOutput();
+      findOutput(true);
       light();
     }
   }
@@ -142,11 +169,80 @@ Array.prototype.sample = function () {
   return this[Math.floor(Math.random() * this.length)];
 }
 
-function findOutput() {
+function computeDistance(exploredAmbiance) {
+  let dist = 0;
+  for (let i = 0; i != 4; ++i) {
+    if (exploredAmbiance[i] != input[i]) {
+      dist += 1;
+    }
+  }
+  return dist;
+}
+
+function normalize(color) {
+  let normalize_color = function (color_value) {
+    if (color_value < 10) {
+      return 0;
+    } else if (color_value < 30) {
+      return 20;
+    } else {
+      return 40;
+    }
+  };
+
+  return {
+    red: normalize_color(color.red),
+    green: normalize_color(color.green),
+    blue: normalize_color(color.blue)
+  };
+}
+
+function find_new_candidate() {
+  let distance = 999;
+  let nearAmbiances = [];
+
+  for (let knownAmbiance in brain) {
+    let localDistance = computeDistance(knownAmbiance);
+
+    if (localDistance < distance) {
+      nearAmbiances = [];
+      distance = localDistance;
+    }
+
+    if (localDistance == distance) {
+      nearAmbiances.push(knownAmbiance);
+    }
+  }
+
+  if (nearAmbiances.length == 0) {
+    return generate_candidate();
+  } else {
+    generated_color = { red: 0, green: 0, blue: 0 };
+
+    for (let nearAmbiance of nearAmbiances) {
+      generated_color.red += brain[nearAmbiance].red;
+      generated_color.green += brain[nearAmbiance].green;
+      generated_color.blue += brain[nearAmbiance].blue;
+    }
+
+    generated_color.red /= nearAmbiances.length;
+    generated_color.green /= nearAmbiances.length;
+    generated_color.blue /= nearAmbiances.length;
+
+    return normalize(generated_color);
+  }
+}
+
+
+function findOutput(forceNewCandidate) {
   if (brain[input]) {
     output = brain[input];
   } else {
-    output = generate_candidate();
+    if (forceNewCandidate) {
+      output = generate_candidate();
+    } else {
+      output = find_new_candidate();
+    }
   }
 }
 
