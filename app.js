@@ -152,13 +152,37 @@ let input = [currentAmbiance, 0, 0, 0];
 
 let output = null;
 
+Array.prototype.sample_with_probabilities = function (probabilities) {
+  const POSSIBLE_VALUES = [0, 10, 20, 30, 40];
+
+  let total_sum = 0;
+  for (let i = 0; i != probabilities.length; ++i) {
+    total_sum += probabilities[i];
+  }
+
+  let rng = Math.random() * total_sum;
+  for (let i = 0; i != probabilities.length; ++i) {
+    if (rng < probabilities[i]) {
+      return POSSIBLE_VALUES[i];
+    }
+
+    rng -= probabilities[i];
+  }
+
+  return 0;
+}
+
+let compute_probabilities = function () {
+  return [20, 0, 20, 0, 20];
+};
+
 let generate_candidate = function () {
-  const POSSIBLE_VALUES = [0, 20, 40]
+  probabilities = compute_probabilities();
 
   candidate = {
-    red: POSSIBLE_VALUES.sample(),
-    green: POSSIBLE_VALUES.sample(),
-    blue: POSSIBLE_VALUES.sample()
+    red: POSSIBLE_VALUES.sample_with_probabilities(probabilities.red),
+    green: POSSIBLE_VALUES.sample_with_probabilities(probabilities.green),
+    blue: POSSIBLE_VALUES.sample_with_probabilities(probabilities.blue)
   };
 
   let isValid = function (c) {
@@ -166,7 +190,7 @@ let generate_candidate = function () {
   }
 
   return isValid(candidate) ? candidate : generate_candidate();
-}
+};
 
 
 Array.prototype.sample = function () {
