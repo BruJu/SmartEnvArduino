@@ -36,6 +36,6 @@ Le site web permet de
 
 ## Auteurs
 
-- **Thomas BOURG**
-- ~~Julian BRUYAT~~
+- Thomas BOURG
+- Julian BRUYAT
 - Théo BUTTEZ
