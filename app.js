@@ -135,6 +135,10 @@ app.post('/request', function (req, res) {
       findOutput(true);
       light();
     }
+  } else {
+    console.log(brain);
+    res.json(brain);
+    return;
   }
   res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
 })
