@@ -21,7 +21,7 @@ app.get('/', function (req, res) {
 app.use('/', express.static('public'));
 
 app.listen(3000, function () {
-  console.log('Example app listening on port 3000!')
+  console.log('Listening on port 3000!')
 })
 
 
@@ -33,14 +33,14 @@ let five = require("johnny-five");
 let board = new five.Board();
 
 const LED_PIN_IDS = {
-  GREEN: 9,
   RED: 10,
+  GREEN: 9,
   BLUE: 11
 };
 const LIGHTSENSOR_PINS = {
-  GREEN: null,
-  RED: null,
-  BLUE: null
+  RED: 'A1',
+  GREEN: 'A2',
+  BLUE: 'A0'
 };
 
 // let flashRedLed = undefined;
@@ -56,19 +56,14 @@ function changeInputRange(value) {
 
 board.on("ready", function () {
   let leds = {};
-  let lights = {};
+  let sensor = {};
 
-  for (let lightId of LIGHTSENSOR_PINS) {
-    lights[lightId] = new five.Light(LIGHTSENSOR_PINS[lightId]);
+  for (let lightId in LIGHTSENSOR_PINS) {
+    sensor[lightId] = new five.Light(LIGHTSENSOR_PINS[lightId]);
   }
-  //let lightSensor = new five.Light(LIGHTSENSOR_PIN);
 
   for (let ledId in LED_PIN_IDS) {
     leds[ledId] = new five.Led(LED_PIN_IDS[ledId]);
-    /*{
-      'pin': new five.Led(LED_PIN_IDS[ledId]),
-      'hasToBeStopped': false
-    };*/
   }
 
   light = function () {
@@ -86,77 +81,15 @@ board.on("ready", function () {
   readInput = function () {
     input = {
       ambiance: currentAmbiance,
-      red: changeInputRange(lights.RED.level),
-      green: changeInputRange(lights.GREEN.level),
-      blue: changeInputRange(lights.BLUE.level),
+      red: changeInputRange(sensor.RED.level),
+      green: changeInputRange(sensor.GREEN.level),
+      blue: changeInputRange(sensor.BLUE.level),
     }
   }
 
-  /*function setColor(r, g, b) {
-    leds['RED'].pin.brightness(r);
-    leds['GREEN'].pin.brightness(g);
-    leds['BLUE'].pin.brightness(b);
-  }*/
-
   changeAmbiance = function (ambiance) {
     currentAmbiance = ambiance;
-    /*for (let ledID in LED_PIN_IDS) {
-      leds[ledID].pin.brightness(0);
-
-      if (leds[ledID].hasToBeStopped) {
-        leds[ledID].pin.stop();
-        leds[ledID].hasToBeStopped = false;
-      }
-    }
-
-    if (ambiance == 'Sea') {
-      setColor(0, 20, 40);
-    } else if (ambiance == 'Blood') {
-      setColor(10, 0, 0);
-      let pair = true;
-      leds['RED'].pulse(1000,
-        function () {
-          if (pair) {
-            setColor(0, 0, 30);
-            setTimeout(function () {
-              setColor(10, 0, 0);
-            }, 100);
-          }
-
-          pair = !pair;
-        }
-      );
-      leds['RED'].hasToBeStopped = true;
-
-    } else if (ambiance == 'Wood') {
-      setColor(0, 25, 0);
-    } else if (ambiance == 'Horrible') {
-      setColor(255, 0, 255);
-    } else {
-      console.log("Fail to match " + ambiance);
-    }*/
-  };
-
-  /*flashRedLed = function () {
-    leds['RED'].brightness(30);
-    setTimeout(function () {
-      leds['RED'].brightness(0);
-    }, 2000);
-  };
-
-  lightSensor.on("change", function () {
-    function normalize(val) {
-      if (val < 0.35) {
-        return -1;
-      } else if (val > 0.75) {
-        return 1;
-      } else {
-        return (val - 0.35) * 2;
-      }
-    }
-
-    setColor(60 * (1 - normalize(this.level)), 0, 0);
-  });*/
+  }
 });
 
 
@@ -345,7 +278,7 @@ Array.prototype.sample = function () {
 }
 
 function hashInput(input) {
-  return String(input.ambiance) + String(input.red) + String(input.green) + String(input.blue0);
+  return String(input.ambiance) + String(input.red) + String(input.green) + String(input.blue);
 }
 
 function findOutput() {
