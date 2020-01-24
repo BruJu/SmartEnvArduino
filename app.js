@@ -41,7 +41,7 @@ let changeAmbiance = undefined;
 let light = undefined;
 let readInput = undefined;
 let lightOff = undefined;
-let currentAmbiance = null;
+let currentAmbiance = "Blood";
 
 function changeInputRange(value) {
   return Math.floor(value * 2);
@@ -69,12 +69,12 @@ board.on("ready", function () {
   }
 
   readInput = function () {
-    input = {
-      ambiance: currentAmbiance,
-      red: changeInputRange(sensor.RED.level),
-      green: changeInputRange(sensor.GREEN.level),
-      blue: changeInputRange(sensor.BLUE.level)
-    }
+    input = [
+      currentAmbiance,
+      changeInputRange(sensor.RED.level),
+      changeInputRange(sensor.GREEN.level),
+      changeInputRange(sensor.BLUE.level)
+    ]
   }
 
   changeAmbiance = function (ambiance) {
@@ -89,6 +89,7 @@ board.on("ready", function () {
 
 
 app.post('/request', function (req, res) {
+  console.log(req.body);
   if (req.body.type === 'ambiance') {
     if (changeAmbiance !== undefined) {
       changeAmbiance(req.body.ambiance);
@@ -100,14 +101,10 @@ app.post('/request', function (req, res) {
       light();
     }
   } else if (req.body.type === 'feedback') {
-    if (req.body.feedback === 1) {
+    if (req.body.feedback == 1) {
       saveInteraction();
     } else {
-
-      if (brain[hashInput(input)]) {
-        brain.delete(hashInput(input));
-      }
-
+      forgetInteraction();
       findOutput();
       light();
     }
@@ -119,12 +116,9 @@ app.post('/request', function (req, res) {
 // IADev Module
 
 let brain = {};
-let input = {
-  ambiance: null,
-  red: null,
-  green: null,
-  blue: null
-};
+
+let input = [currentAmbiance, 0, 0, 0];
+
 let output = null;
 
 let generate_candidate = function () {
@@ -148,20 +142,20 @@ Array.prototype.sample = function () {
   return this[Math.floor(Math.random() * this.length)];
 }
 
-function hashInput(input) {
-  return String(input.ambiance) + String(input.red) + String(input.green) + String(input.blue);
-}
-
 function findOutput() {
-  let hash = hashInput(input);
-  if (brain[hash]) {
-    output = brain[hash];
+  if (brain[input]) {
+    output = brain[input];
   } else {
     output = generate_candidate();
   }
 }
 
 function saveInteraction() {
-  let hash = hashInput(input);
-  brain[hash] = output;
+  brain[input] = output;
+}
+
+function forgetInteraction() {
+  if (brain[input]) {
+    delete brain[input];
+  }
 }
