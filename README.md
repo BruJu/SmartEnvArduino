@@ -18,7 +18,6 @@ Le site web permet de
 - Choisir une ambiance
 - Déclencher l'allumage de la led
 - Noter l'interaction (valeurs de luminosité - éclairage) afin de s'adapter
-- Consulter l'historique des ambiances et des couleurs affichées **TO DO**
 
 ### Inventaire
 - Une led multicolore
@@ -36,6 +35,6 @@ Le site web permet de
 
 ## Auteurs
 
-- Thomas BOURG
-- Julian BRUYAT
-- Théo BUTTEZ
+- Thomas **B**OURG
+- Julian **B**RUYAT
+- Théo   **B**UTTEZ

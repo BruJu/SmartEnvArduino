@@ -32,15 +32,8 @@ let five = require("johnny-five");
 
 let board = new five.Board();
 
-const LED_PIN_IDS = {
-  RED: 10,
-  GREEN: 9,
-  BLUE: 11
-};
-const LIGHTSENSOR_PINS = {
-  RED: 'A1',
-  GREEN: 'A2',
-  BLUE: 'A0'
+const PINS = {
+  RED: [10, 'A1'], GREEN: [9, 'A2'], BLUE: [11, 'A0']
 };
 
 // let flashRedLed = undefined;
@@ -58,12 +51,9 @@ board.on("ready", function () {
   let leds = {};
   let sensor = {};
 
-  for (let lightId in LIGHTSENSOR_PINS) {
-    sensor[lightId] = new five.Light(LIGHTSENSOR_PINS[lightId]);
-  }
-
-  for (let ledId in LED_PIN_IDS) {
-    leds[ledId] = new five.Led(LED_PIN_IDS[ledId]);
+  for (let color in PINS) {
+    sensor[color] = new five.Light(PINS[color][1]);
+    leds[color] = new five.Led(PINS[color][0]);
   }
 
   light = function () {
@@ -83,7 +73,7 @@ board.on("ready", function () {
       ambiance: currentAmbiance,
       red: changeInputRange(sensor.RED.level),
       green: changeInputRange(sensor.GREEN.level),
-      blue: changeInputRange(sensor.BLUE.level),
+      blue: changeInputRange(sensor.BLUE.level)
     }
   }
 
@@ -99,7 +89,6 @@ board.on("ready", function () {
 
 
 app.post('/request', function (req, res) {
-  console.log(req.body);
   if (req.body.type === 'ambiance') {
     if (changeAmbiance !== undefined) {
       changeAmbiance(req.body.ambiance);
@@ -113,16 +102,17 @@ app.post('/request', function (req, res) {
   } else if (req.body.type === 'feedback') {
     if (req.body.feedback === 1) {
       saveInteraction();
-    }
-    if (lightOff !== undefined) {
-      lightOff();
+    } else {
+
+      if (brain[hashInput(input)]) {
+        brain.delete(hashInput(input));
+      }
+
+      findOutput();
+      light();
     }
   }
-  /*if (req.body.type == 'lightOn') {
-    if (changeAmbiance !== undefined) {
-      changeAmbiance(req.body.ambiance);
-    }
-  }*/
+  res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
 })
 
 // ===========================================================================
@@ -136,142 +126,23 @@ let input = {
   blue: null
 };
 let output = null;
-let candidates = [{
-    red: 0,
-    green: 0,
-    blue: 0
-  },
-  {
-    red: 0,
-    green: 0,
-    blue: 127
-  },
-  {
-    red: 0,
-    green: 0,
-    blue: 255
-  },
-  {
-    red: 0,
-    green: 127,
-    blue: 0
-  },
-  {
-    red: 0,
-    green: 127,
-    blue: 127
-  },
-  {
-    red: 0,
-    green: 127,
-    blue: 255
-  },
-  {
-    red: 0,
-    green: 255,
-    blue: 0
-  },
-  {
-    red: 0,
-    green: 255,
-    blue: 127
-  },
-  {
-    red: 0,
-    green: 255,
-    blue: 255
-  },
-  {
-    red: 255,
-    green: 0,
-    blue: 0
-  },
-  {
-    red: 255,
-    green: 0,
-    blue: 127
-  },
-  {
-    red: 255,
-    green: 0,
-    blue: 255
-  },
-  {
-    red: 255,
-    green: 127,
-    blue: 0
-  },
-  {
-    red: 255,
-    green: 127,
-    blue: 127
-  },
-  {
-    red: 255,
-    green: 127,
-    blue: 255
-  },
-  {
-    red: 255,
-    green: 255,
-    blue: 0
-  },
-  {
-    red: 255,
-    green: 255,
-    blue: 127
-  },
-  {
-    red: 255,
-    green: 255,
-    blue: 255
-  },
-  {
-    red: 127,
-    green: 0,
-    blue: 0
-  },
-  {
-    red: 127,
-    green: 0,
-    blue: 127
-  },
-  {
-    red: 127,
-    green: 0,
-    blue: 255
-  },
-  {
-    red: 127,
-    green: 127,
-    blue: 0
-  },
-  {
-    red: 127,
-    green: 127,
-    blue: 127
-  },
-  {
-    red: 127,
-    green: 127,
-    blue: 255
-  },
-  {
-    red: 127,
-    green: 255,
-    blue: 0
-  },
-  {
-    red: 127,
-    green: 255,
-    blue: 127
-  },
-  {
-    red: 127,
-    green: 255,
-    blue: 255
+
+let generate_candidate = function () {
+  const POSSIBLE_VALUES = [0, 20, 40]
+
+  candidate = {
+    red: POSSIBLE_VALUES.sample(),
+    green: POSSIBLE_VALUES.sample(),
+    blue: POSSIBLE_VALUES.sample()
+  };
+
+  let isValid = function (c) {
+    return c.red != 0 || c.green != 0 || c.blue != 0;
   }
-];
+
+  return isValid(candidate) ? candidate : generate_candidate();
+}
+
 
 Array.prototype.sample = function () {
   return this[Math.floor(Math.random() * this.length)];
@@ -286,7 +157,7 @@ function findOutput() {
   if (brain[hash]) {
     output = brain[hash];
   } else {
-    output = candidates.sample();
+    output = generate_candidate();
   }
 }
 
