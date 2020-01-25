@@ -51,9 +51,9 @@
   <div class="panel">
     <div class="panel-heading">Historique</div>
     <div class="panel-block">
-      <button class="button">R&eacute;cup&eacute;rer l'historique</button>
+      <button class="button" onclick="sendHistoryRequest()">R&eacute;cup&eacute;rer l'historique</button>
     </div>
-    <div class="panel_block">
+    <div class="panel-block">
       <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
         <thead>
           <tr>
@@ -62,7 +62,7 @@
             <th>Couleur de la LED</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="history">
         </tbody>
       </table>
     </div>
