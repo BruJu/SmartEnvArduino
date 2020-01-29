@@ -46,6 +46,9 @@ function pickColor() {
 
 }
 
+$('#color_manual_red').on('input', pickColor);
+$('#color_manual_green').on('input', pickColor);
+$('#color_manual_blue').on('input', pickColor);
 
 function sendLearnInteraction() {
     let redValue = parseInt($('#color_manual_red').val());
@@ -61,11 +64,6 @@ function sendLearnInteraction() {
         type: 'POST'
     });
 }
-
-$('#color_manual_red').on('input', pickColor);
-$('#color_manual_green').on('input', pickColor);
-$('#color_manual_blue').on('input', pickColor);
-
 
 function sendHistoryRequest() {
     $.ajax({
@@ -104,6 +102,7 @@ function sendHistoryRequest() {
     });
 }
 
+// On load, request the current ambiance
 $(document).ready(function() {
     $.ajax({
         url: 'request',
