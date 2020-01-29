@@ -40,10 +40,10 @@ const PINS = {
 let changeAmbiance = undefined;
 let light = undefined;
 let readInput = undefined;
-let lightOff = undefined;
-let currentAmbiance = "Blood";
+let currentAmbiance = "Regular";
 let blockAutoChange = false;
 let printSensorState = undefined;
+let dispostive_is_active = false;
 
 function changeInputRange(value) {
   return Math.floor(value * 2);
@@ -98,15 +98,17 @@ board.on("ready", function () {
   }
 
   light = function () {
-    leds['RED'].brightness(output.red);
-    leds['GREEN'].brightness(output.green);
-    leds['BLUE'].brightness(output.blue);
-  }
+    let brightnesses = undefined;
+    
+    if (dispostive_is_active) {
+      brightnesses = output;
+    } else {
+      brightnesses = { red: 0, green: 0, blue: 0 };
+    }
 
-  lightOff = function () {
-    leds['RED'].brightness(0);
-    leds['GREEN'].brightness(0);
-    leds['BLUE'].brightness(0);
+    leds['RED'].brightness(brightnesses.red);
+    leds['GREEN'].brightness(brightnesses.green);
+    leds['BLUE'].brightness(brightnesses.blue);
   }
 
   readInput = function () {
@@ -145,10 +147,14 @@ app.post('/request', function (req, res) {
     }
   } else if (req.body.type === 'on') {
     if (readInput !== undefined && light !== undefined) {
+      dispostive_is_active = true;
       readInput();
       findOutput();
       light();
     }
+  } else if (req.body.type === 'off') {
+    dispostive_is_active = false;
+    light();
   } else if (req.body.type === 'feedback') {
     readInput();
     if (req.body.feedback == 1) {
@@ -178,6 +184,9 @@ app.post('/request', function (req, res) {
     output.blue  = parseInt(req.body.color[2]);
     readInput();
     saveInteraction();
+  } else if (req.body.type === 'request_current_ambiance') {
+    res.json({'current_ambiance': currentAmbiance});
+    return;
   } else {
     console.log("Unknown request received " + req.body);
   }

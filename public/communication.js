@@ -9,11 +9,11 @@ function feedback(feedBackValue) {
     });
 }
 
-function trigger() {
+function simple_request(kind) {
     $.ajax({
         url: 'request',
         data: {
-            type: 'on'
+            type: kind
         },
         type: 'POST'
     });
@@ -103,3 +103,15 @@ function sendHistoryRequest() {
         }
     });
 }
+
+$(document).ready(function() {
+    $.ajax({
+        url: 'request',
+        data: {
+            type: 'request_current_ambiance'
+        },
+        type: 'POST'
+    }).done(function (data) {
+        $("#ambiance").val(data['current_ambiance']);
+    });
+});
