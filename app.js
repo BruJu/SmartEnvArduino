@@ -223,6 +223,7 @@ app.post('/request', function (req, res) {
 // ==== IADev Module : Learning and predicting the expected light color
 
 let brain = {};
+let hated_interactions = {};
 
 /**
  * Returns a random element from the array using the passed probabilities
@@ -260,7 +261,16 @@ let generate_candidate = function () {
   };
 
   let isValid = function (c) {
-    return c.red != 0 || c.green != 0 || c.blue != 0;
+    if (c.red == 0 && c.green == 0 && c.blue == 0) {
+      return false;
+    }
+    
+    hate_rate = hated_interactions[[input, JSON.stringify(c)]];
+    if (hate_rate !== undefined) {
+      return Math.random() >= hate_rate;
+    }
+
+    return true;
   }
 
   return isValid(candidate) ? candidate : generate_candidate();
@@ -379,4 +389,11 @@ function forgetInteraction() {
   if (brain[input]) {
     delete brain[input];
   }
+  const DECAY_RATE = 0.95;
+
+  for (hated_interation in hated_interactions) {
+    hated_interactions[hated_interation] *= DECAY_RATE;
+  }
+
+  hated_interactions[[input, JSON.stringify(output)]] = 1.0
 }
