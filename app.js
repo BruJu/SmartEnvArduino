@@ -42,6 +42,7 @@ let light = undefined;
 let readInput = undefined;
 let lightOff = undefined;
 let currentAmbiance = "Blood";
+let blockAutoChange = false;
 
 function changeInputRange(value) {
   return Math.floor(value * 2);
@@ -55,7 +56,6 @@ board.on("ready", function () {
 
   for (let color in PINS) {
     let opt = { pin: PINS[color][1], freq: 250 };
-    console.log(opt);
     sensor[color] = new five.Light(opt);
     leds[color] = new five.Led(PINS[color][0]);
 
@@ -70,11 +70,24 @@ board.on("ready", function () {
           changeInputRange(sensor.BLUE.level)
         ];
 
-        if (brain[potentialInput]) {
+        /*
+        for (let c in PINS) {
+          leds[c].brightness(Math.max(sensor[c].level, 0) * 90);
+          console.log(c);
+          console.log(sensor[c].level);
+
+        }
+
+        */
+
+        
+
+        if (!blockAutoChange && brain[potentialInput]) {
           readInput();
           findOutput();
           light();
         }
+        
       });
     } else {
       sensor[color].on("change", function () {
@@ -102,6 +115,7 @@ board.on("ready", function () {
       changeInputRange(sensor.GREEN.level),
       changeInputRange(sensor.BLUE.level)
     ]
+    blockAutoChange = false;
   }
 
   changeAmbiance = function (ambiance) {
@@ -128,6 +142,7 @@ app.post('/request', function (req, res) {
       light();
     }
   } else if (req.body.type === 'feedback') {
+    readInput();
     if (req.body.feedback == 1) {
       saveInteraction();
     } else {
@@ -135,13 +150,23 @@ app.post('/request', function (req, res) {
       findOutput(true);
       light();
     }
-  } else {
+  } else if (req.body.type === 'color_choice') {
+    blockAutoChange = true;
+    output = {};
+    output.red   = parseInt(req.body.color[0]);
+    output.green = parseInt(req.body.color[1]);
+    output.blue  = parseInt(req.body.color[2]);
+    light();
+  } else if (req.body.type === 'sendHistory') {
     console.log(brain);
+
     res.json(brain);
     return;
+  } else {
+    console.log("Unknown request received " + req.body);
   }
   res.header("Access-Control-Allow-Origin", "*").sendStatus(200);
-})
+});
 
 // ===========================================================================
 // IADev Module
@@ -153,8 +178,6 @@ let input = [currentAmbiance, 0, 0, 0];
 let output = null;
 
 Array.prototype.sample_with_probabilities = function (probabilities) {
-  const POSSIBLE_VALUES = [0, 10, 20, 30, 40];
-
   let total_sum = 0;
   for (let i = 0; i != probabilities.length; ++i) {
     total_sum += probabilities[i];
@@ -163,7 +186,7 @@ Array.prototype.sample_with_probabilities = function (probabilities) {
   let rng = Math.random() * total_sum;
   for (let i = 0; i != probabilities.length; ++i) {
     if (rng < probabilities[i]) {
-      return POSSIBLE_VALUES[i];
+      return this[i];
     }
 
     rng -= probabilities[i];
@@ -173,11 +196,17 @@ Array.prototype.sample_with_probabilities = function (probabilities) {
 }
 
 let compute_probabilities = function () {
-  return [20, 0, 20, 0, 20];
+  return [20, 10, 20, 10, 20];
 };
 
 let generate_candidate = function () {
-  probabilities = compute_probabilities();
+  const POSSIBLE_VALUES = [0, 10, 20, 30, 40];
+
+  probabilities = {
+    red: compute_probabilities(),
+    green: compute_probabilities(),
+    blue: compute_probabilities()
+  }
 
   candidate = {
     red: POSSIBLE_VALUES.sample_with_probabilities(probabilities.red),

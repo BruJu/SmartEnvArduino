@@ -30,6 +30,28 @@ function changeAmbiance() {
     })
 }
 
+function pickColor() {
+    let redValue = parseInt($('#color_manual_red').val());
+    let greenValue = parseInt($('#color_manual_green').val());
+    let blueValue = parseInt($('#color_manual_blue').val());
+
+    $.ajax({
+        url: 'request',
+        data: {
+            type: 'color_choice',
+            color: [redValue, greenValue, blueValue]
+        },
+        type: 'POST'
+    })
+
+}
+
+$('#color_manual_red').on('input', pickColor);
+$('#color_manual_green').on('input', pickColor);
+$('#color_manual_blue').on('input', pickColor);
+
+
+
 function sendHistoryRequest() {
     /*$.ajax({
         url: 'request',

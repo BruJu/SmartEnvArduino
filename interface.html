@@ -49,6 +49,21 @@
     </div>
   </div>
   <div class="panel">
+    <div class="panel-heading">Choisir sa couleur</div>
+    <div class="panel-block">
+      <p>
+        <input class="slider is-fullwidth is-danger" step="1" min="0" max="60" value="30" type="range" id="color_manual_red">
+        <br>
+        <input class="slider is-fullwidth is-success" step="1" min="0" max="60" value="30" type="range" id="color_manual_green">
+        <br>
+        <input class="slider is-fullwidth is-info" step="1" min="0" max="60" value="30" type="range" id="color_manual_blue">
+        </p>
+    </div>
+    <div class="panel-block">
+      <button class="button is-primary" onclick="pickColor()">Valider</button>
+    </div>
+  </div>
+  <div class="panel">
     <div class="panel-heading">Historique</div>
     <div class="panel-block">
       <button class="button" onclick="sendHistoryRequest()">R&eacute;cup&eacute;rer l'historique</button>
