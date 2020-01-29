@@ -7,7 +7,7 @@ const app = express()
 
 // Body Parser
 const bodyparser = require('body-parser');
-app.use(bodyparser.urlencoded());
+app.use(bodyparser.urlencoded({ extended: true }));
 
 // ============================================================================
 // ==== Routing : Website
@@ -21,7 +21,7 @@ app.get('/', function (req, res) {
 app.use('/', express.static('public'));
 
 app.listen(3000, function () {
-  console.log('Listening on port 3000!')
+  console.log('Listening on port 3000 !')
 })
 
 
@@ -29,14 +29,13 @@ app.listen(3000, function () {
 // ==== Arduino Board
 
 let five = require("johnny-five");
-
 let board = new five.Board();
 
 const PINS = {
   RED: [10, 'A1'], GREEN: [9, 'A2'], BLUE: [11, 'A0']
 };
 
-// let flashRedLed = undefined;
+
 let changeAmbiance = undefined;
 let light = undefined;
 let readInput = undefined;
@@ -60,41 +59,22 @@ board.on("ready", function () {
     sensor[color] = new five.Light(opt);
     leds[color] = new five.Led(PINS[color][0]);
 
-    if (color == 'BLUE') {
-      sensor[color].on("change", function () {
-        sensorColor[color] = this.level;
+    sensor[color].on("change", function () {
+      sensorColor[color] = this.level;
 
-        potentialInput = [
-          currentAmbiance,
-          changeInputRange(sensor.RED.level),
-          changeInputRange(sensor.GREEN.level),
-          changeInputRange(sensor.BLUE.level)
-        ];
+      potentialInput = [
+        currentAmbiance,
+        changeInputRange(sensor.RED.level),
+        changeInputRange(sensor.GREEN.level),
+        changeInputRange(sensor.BLUE.level)
+      ];
 
-        /*
-        for (let c in PINS) {
-          leds[c].brightness(Math.max(sensor[c].level, 0) * 90);
-          console.log(c);
-          console.log(sensor[c].level);
-
-        }
-
-        */
-
-        
-
-        if (!blockAutoChange && brain[potentialInput]) {
-          readInput();
-          findOutput();
-          light();
-        }
-        
-      });
-    } else {
-      sensor[color].on("change", function () {
-        sensorColor[color] = this.level;
-      });
-    }
+      if (!blockAutoChange && brain[potentialInput]) {
+        readInput();
+        findOutput();
+        light();
+      }
+    });
   }
 
   light = function () {
