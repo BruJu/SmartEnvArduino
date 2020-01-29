@@ -6,7 +6,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>AmbiLearn !</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.0/css/bulma.min.css">
+  <link rel="stylesheet" href="bulma-slider.min.css">
   <script defer src="https://use.fontawesome.com/releases/v5.3.1/js/all.js"></script>
+  <script defer src="bulma-slider.min.js"></script>
+  <style>
+    .slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 1em;
+      border-radius: 5px;  
+      background: #d3d3d3;
+      outline: none;
+      opacity: 0.7;
+      -webkit-transition: .2s;
+      transition: opacity .2s;
+    }
+
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%; 
+      cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    .redslider::-webkit-slider-thumb, .redslider::-moz-range-thumb {
+      background: rgb(189, 61, 61);
+    }
+
+    .blueslider::-webkit-slider-thumb, .blueslider::-moz-range-thumb {
+      background: rgb(60, 87, 160);
+    }
+
+    .greenslider::-webkit-slider-thumb, .greenslider::-moz-range-thumb {
+      background: #4CAF50;
+    }
+   </style>
 </head>
 
 <body>
@@ -51,16 +94,15 @@
   <div class="panel">
     <div class="panel-heading">Choisir sa couleur</div>
     <div class="panel-block">
-      <p>
-        <input class="slider is-fullwidth is-danger" step="1" min="0" max="60" value="30" type="range" id="color_manual_red">
+      <p style="width: 100%; max-width: 400px; text-align: center;">
+        <input step="1" min="0" max="60" value="30" type="range" id="color_manual_red" class="slider redslider">
         <br>
-        <input class="slider is-fullwidth is-success" step="1" min="0" max="60" value="30" type="range" id="color_manual_green">
+        <input step="1" min="0" max="60" value="30" type="range" id="color_manual_green" class="slider greenslider">
         <br>
-        <input class="slider is-fullwidth is-info" step="1" min="0" max="60" value="30" type="range" id="color_manual_blue">
+        <input step="1" min="0" max="60" value="30" type="range" id="color_manual_blue" class="slider blueslider">
+        <br><br>
+        <button class="button is-primary" onclick="sendLearnInteraction()">Valider</button>
         </p>
-    </div>
-    <div class="panel-block">
-      <button class="button is-primary" onclick="sendLearnInteraction()">Valider</button>
     </div>
   </div>
   <div class="panel">
