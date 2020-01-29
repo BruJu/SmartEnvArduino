@@ -43,6 +43,7 @@ let readInput = undefined;
 let lightOff = undefined;
 let currentAmbiance = "Blood";
 let blockAutoChange = false;
+let printSensorState = undefined;
 
 function changeInputRange(value) {
   return Math.floor(value * 2);
@@ -121,6 +122,12 @@ board.on("ready", function () {
   changeAmbiance = function (ambiance) {
     currentAmbiance = ambiance;
   }
+
+  printSensorState = function() {
+    console.log("Sensor : Red=" + sensor.RED.level
+                    + " Green=" + sensor.GREEN.level
+                    +  " Blue=" + sensor.BLUE.level);
+  }
 });
 
 
@@ -129,8 +136,9 @@ board.on("ready", function () {
 // ==== Routing : Requests
 
 
+
 app.post('/request', function (req, res) {
-  console.log(req.body);
+  // console.log(req.body);
   if (req.body.type === 'ambiance') {
     if (changeAmbiance !== undefined) {
       changeAmbiance(req.body.ambiance);
@@ -157,11 +165,19 @@ app.post('/request', function (req, res) {
     output.green = parseInt(req.body.color[1]);
     output.blue  = parseInt(req.body.color[2]);
     light();
-  } else if (req.body.type === 'sendHistory') {
+  } else if (req.body.type === 'historyRequest') {
     console.log(brain);
 
     res.json(brain);
     return;
+  } else if (req.body.type === 'color_learn') {
+    blockAutoChange = true;
+    output = {};
+    output.red   = parseInt(req.body.color[0]);
+    output.green = parseInt(req.body.color[1]);
+    output.blue  = parseInt(req.body.color[2]);
+    readInput();
+    saveInteraction();
   } else {
     console.log("Unknown request received " + req.body);
   }
@@ -305,6 +321,8 @@ function findOutput(forceNewCandidate) {
 
 function saveInteraction() {
   brain[input] = output;
+  printSensorState();
+  console.log("Saved Interaction " + input + " = " + output);
 }
 
 function forgetInteraction() {

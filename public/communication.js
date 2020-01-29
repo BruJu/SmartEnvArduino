@@ -42,8 +42,24 @@ function pickColor() {
             color: [redValue, greenValue, blueValue]
         },
         type: 'POST'
-    })
+    });
 
+}
+
+
+function sendLearnInteraction() {
+    let redValue = parseInt($('#color_manual_red').val());
+    let greenValue = parseInt($('#color_manual_green').val());
+    let blueValue = parseInt($('#color_manual_blue').val());
+
+    $.ajax({
+        url: 'request',
+        data: {
+            type: 'color_learn',
+            color: [redValue, greenValue, blueValue]
+        },
+        type: 'POST'
+    });
 }
 
 $('#color_manual_red').on('input', pickColor);
@@ -51,29 +67,26 @@ $('#color_manual_green').on('input', pickColor);
 $('#color_manual_blue').on('input', pickColor);
 
 
-
 function sendHistoryRequest() {
-    /*$.ajax({
+    $.ajax({
         url: 'request',
         data: {
             type: 'historyRequest'
         },
         type: 'POST'
-    }).done((data) => {*/
-        let sample = {
-            'Blood,0,0,0': {
-                red: 800,
-                green: 160,
-                blue: 40
-            }
-        };
+    }).done((sample) => {
         let table = $('#history');
         table.empty();
+        
         for(let index in sample) {
             let [ambiance, input_red, input_green, input_blue] = index.split(',');
-            let output_red = sample[index].red;
-            let output_green = sample[index].green;
-            let output_blue = sample[index].blue;
+            let filter_input = function(v) { return parseInt(v) * 255; };
+            input_red = filter_input(input_red);
+            input_green = filter_input(input_green);
+            input_blue = filter_input(input_blue);
+            let output_red = parseInt(sample[index].red) * 255 / 60;
+            let output_green = parseInt(sample[index].green) * 255 / 60;
+            let output_blue = parseInt(sample[index].blue) * 255 / 60;
             let row = $('<tr>');
             let ambiance_cell = $('<td>');
             let ambiance_div = $('<div>');
@@ -88,5 +101,5 @@ function sendHistoryRequest() {
             row.append(output_cell);
             table.append(row);
         }
-    //});
+    });
 }
